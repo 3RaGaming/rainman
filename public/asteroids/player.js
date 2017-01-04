@@ -6,13 +6,12 @@
 function player(x, y) {
   this.x = x;
   this.y = y;
-}
   
 
   this.render = function() {
     fill(255, 0, 0);
-	ellipse(this.x, this.y, 50, 50);
-  }
+	ellipse(x, y, 50, 50);
+  };
 
  this.move = function() {
      if (keyIsDown(LEFT_ARROW))
@@ -26,11 +25,6 @@ function player(x, y) {
 
   if (keyIsDown(DOWN_ARROW))
     this.y+=5;
- }
-  
-
-	
-	
-	
-	
+ };
+ 
 }
