@@ -22,6 +22,13 @@ var socket = require('socket.io');
 
 var io = socket(server);
 
+setInterval(heartbeat, 33);
+
+function heartbeat(){
+  io.sockets.emit('heartbeat', players);
+}
+
+
 io.sockets.on('connection', function(socket) {
 	console.log('We have a new client: ' + socket.id);
 
