@@ -38,21 +38,29 @@ function setup() {
 function draw() {
   background(0);
 
+
   for (var i = players.length - 1; i >= 0; i--) {
     var id = players[i].id;
-    if (id.substring(2, id.length) !== socket.id) {
+    if (id !== socket.id) {
       fill(0, 0, 255);
       ellipse(players[i].x, players[i].y, 50, 50);
 
       fill(255);
       textAlign(CENTER);
-      textSize(3);
-      text(players[i].id, players[i].x, players[i].y + players[i].r);
+      textSize(20);
+      text(players[i].id, players[i].x, players[i].y);
     }
-  
+  }
+
   player.render();
   player.move();
 
+  var data = {
+	  x: player.x,
+	  y: player.y,
+  };
+
+  socket.emit('update', data);
 }
 
  function mouseClicked() {

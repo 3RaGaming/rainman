@@ -10,7 +10,7 @@ function player(x, y) {
 
   this.render = function() {
     fill(255, 0, 0);
-	ellipse(x, y, 50, 50);
+	  ellipse(this.x, this.y, 50, 50);
   };
 
  this.move = function() {
