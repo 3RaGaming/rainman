@@ -5,30 +5,21 @@
 
 
 var socket;
+var player;
 
-
-var ship;
-
-var ships = [];
-var asteroids = [];
-var lasers = [];
 
 function setup() {
-  createCanvas(1200, 600);
+  createCanvas(500, 500);
   
   socket = io.connect('http://localhost:3000');
   
   
   
-  ship = new Ship(height / 2, width / 2, 20);
-  for (var i = 0; i < 5; i++) {
-    asteroids.push(new Asteroid());
-  }
-  
+  player = new player(50, 50);
+   
   var data = {
-	  x: ship.pos.x,
-	  y: ship.pos.y,
-	  r: ship.r
+	  x: player.x,
+	  y: player.y,
   };
   
   socket.emit('start', data);
@@ -39,25 +30,12 @@ function setup() {
 
 function draw() {
   background(0);
-  
-   for (var i = 0; i < asteroids.length; i++) {
-    if (ship.hits(asteroids[i])) {
-      console.log('ooops!');
-    }
-    asteroids[i].render();
-    asteroids[i].update();
-    asteroids[i].edges();
-  }
-
-  translate(width/2-ship.pos.x, height/2-ship.pos.y)
 
   
-  ship.render();
-  ship.turn();
-  ship.move();
+  player.render();
+  player.move();
 
 }
 
  function mouseClicked() {
-    //lasers.push(new Laser(ship.pos, ship.heading));
   }  

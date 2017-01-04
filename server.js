@@ -3,11 +3,11 @@
 
 var ships = [];
 
-function Ship() {
-	//this.id = id;
-	this.pos = pos;
-	this.r = r;
-	this.heading = heading;
+function Player() {
+  this.id = id;
+  this.x = x;
+  this.y = y;
+  this.r = r;
 	
 }
 
