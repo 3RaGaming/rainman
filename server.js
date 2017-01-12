@@ -3,10 +3,21 @@
 
 var players = [];
 
-function Player(id, xPos, yPos) {
+function Player(id, xPos, yPos, colorObj) {
 	this.id = id;
 	this.x = xPos;
   this.y = yPos;
+  this.color = colorObj;
+}
+
+function generateRandomColor(){
+  var colorObj = {
+    r: Math.floor((Math.random() * 235) + 20),
+    b: Math.floor((Math.random() * 235) + 20),
+    g: Math.floor((Math.random() * 235) + 20)
+  };
+  console.log(colorObj);
+  return colorObj;
 }
 
 var express = require('express');
@@ -34,13 +45,14 @@ io.sockets.on('connection', function(socket) {
 
 	socket.on('start', function(data) {
 		//console.log(socket.id + " " + data.x + " " + data.y + " " + data.r + " " +data.heading);
-		var p = new Player(socket.id, data.x, data.y);
+		var p = new Player(socket.id, data.x, data.y, generateRandomColor());
 		players.push(p);
+    //console.log(players);
 		//socket.broadcast.emit('mouse', data);
 	});
 
     socket.on('update', function(data) {
-        console.log(data); 
+        //console.log(data); 
         //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
         var p;
         for (var i = 0; i < players.length; i++) {
@@ -59,6 +71,14 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('disconnect', function() {
     console.log("Client has disconnected");
+
+    for (var i = 0; i < players.length; i++) {
+      if (socket.id == players[i].id) {
+        players.splice(i, 1);
+        break;
+      }
+    } 
+
   });
 
 });
