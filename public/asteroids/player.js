@@ -3,13 +3,14 @@
 // http://patreon.com/codingrainbow
 // Code for: https://youtu.be/hacZU523FyM
 
-function player(x, y) {
-  this.x = x;
-  this.y = y;
-  
+function player(xPos, yPos, color) {
+  this.x = xPos;
+  this.y = yPos;
+  this.color = color;
 
   this.render = function() {
     fill(255, 0, 0);
+    text(this.x + ' ' + this.y, 50, 50);
 	  ellipse(this.x, this.y, 50, 50);
   };
 
