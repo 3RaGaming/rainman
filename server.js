@@ -47,12 +47,12 @@ io.sockets.on('connection', function(socket) {
 		//console.log(socket.id + " " + data.x + " " + data.y + " " + data.r + " " +data.heading);
 		var p = new Player(socket.id, data.x, data.y, generateRandomColor());
 		players.push(p);
-    console.log(players);
+    //console.log(players);
 		//socket.broadcast.emit('mouse', data);
 	});
 
     socket.on('update', function(data) {
-        console.log(data); 
+        //console.log(data); 
         //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
         var p;
         for (var i = 0; i < players.length; i++) {
@@ -71,23 +71,14 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('disconnect', function() {
     console.log("Client has disconnected");
-    var indexToRemove;
-    if (players.length == 1){
-      players.pop();
-    }else{
-      for (var i = 0; i < players.length; i++) {
-        if (socket.id == players[i].id) {
-          indexToRemove = i;
-        }
-      }
-      
-      if (indexToRemove){
-        players.splice(indexToRemove, 1);
-      }
-    }
 
-    
-    console.log(players);
+    for (var i = 0; i < players.length; i++) {
+      if (socket.id == players[i].id) {
+        players.splice(i, 1);
+        break;
+      }
+    } 
+
   });
 
 });

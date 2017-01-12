@@ -29,8 +29,6 @@ function setup() {
 
     }
   );
-  
-  //player = new player(50, 50);
 }
 
 function draw() {
@@ -40,7 +38,7 @@ function draw() {
     console.log(players[i]);
     var id = players[i].id;
     if (id !== socket.id) {
-      fill(players[i].color.r, players[i].color.r, players[i].color.b);
+      fill(players[i].color.r, players[i].color.g, players[i].color.b);
       
       ellipse(players[i].x, players[i].y, 50, 50);
 
@@ -49,40 +47,27 @@ function draw() {
       textSize(20);
       text(players[i].id, players[i].x, players[i].y);
     }else{
-      /*
+
       if (!player){
-        player = new player(players[i].x, players[i].y, players[i].color);
+        player = new Player(players[i].x, players[i].y, players[i].color);
         player.render();
+        player.move();
+        var data = {
+          x: player.x,
+          y: player.y,
+        };
+        socket.emit('update', data);
       }else{
         player.render();
+        player.move();
+        var data = {
+          x: player.x,
+          y: player.y,
+        };
+        socket.emit('update', data);
       }
-      */
-      ellipse(100, 100, 50, 50);
-      /*
-      if (!player){
-        player = new player(player[i]);
-      }else{
-        console.log('player exists');
-      }
-      */
-      
-      //player = players[i];
     }
   }
-  /*
-  if (player != null){
-
-    player.render();
-    player.move();
-
-    var data = {
-      x: player.x,
-      y: player.y,
-    };
-
-    socket.emit('update', data);
-  }
-  */
 }
 
  function mouseClicked() {
