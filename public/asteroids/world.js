@@ -1,34 +1,42 @@
-function World(worldWidth, worldHeight){
-    this.width = worldWidth;
-    this.height = worldHeight;
-    this.screenPosition = createVector(width / 2, height / 2);
-
-    this.render = function(){
-        stroke(50);
-        strokeWeight(1);
-        for(var i = 0; i < this.width / 20; i++){
-            line(i * 20, 0, i * 20, this.height);
-        }
-
-        for(var i = 0; i < this.height / 20; i++){
-            line(0, i * 20, this.width, i * 20);
-        }
-    };
+function World(gameSettings){
+    this.width = gameSettings.worldWidth;
+    this.height = gameSettings.worldHeight;
+    this.screenPosition = createVector(gameSettings.clientWindowWidth / 2, gameSettings.clientWindowHeight / 2);
+    this.gridLineSpacing = 20;
 
     this.renderAccordingToPlayer = function(player){
         var xOffset = 0;
         var yOffset = 0;
 
-        if (player.mapPosition.x <= 400){
-            xOffset = 400 - player.mapPosition.x;
-        }else if (player.mapPosition.x >= (this.worldWidth - 400)){
-
+        if (player.mapPosition.x <= this.screenPosition.x){
+            xOffset = this.screenPosition.x - player.mapPosition.x;
+        }else{
+            xOffset = -player.mapPosition.x + this.screenPosition.x;
         }
 
-        if (player.mapPosition.y <= 300){
-
-        }else if (player.mapPosition.y >= (this.worldHeight - 300)){
-
+        if (player.mapPosition.y <= this.screenPosition.y){
+            yOffset = this.screenPosition.y - player.mapPosition.y;
+        }else{
+            yOffset = -player.mapPosition.y + this.screenPosition.y; 
         }  
+
+        push();
+
+        translate(xOffset, yOffset);
+        stroke(50); // Gray Color Lines
+
+        //////////////////////////////////////////////////
+        // DRAW GRIDLINES (Temporary World)
+        // Vertical Lines
+        for(var i = 0; i <= this.width / this.gridLineSpacing; i++){
+            line(i * this.gridLineSpacing, 0, i * this.gridLineSpacing, this.height);
+        }
+        // Horizontal Lines
+        for(var i = 0; i <= this.height / this.gridLineSpacing; i++){
+            line(0, i * this.gridLineSpacing, this.width, i * this.gridLineSpacing);
+        }
+        //////////////////////////////////////////////////
+
+        pop();
     }
 }

@@ -3,17 +3,24 @@
 //////////////////////////////////////////////////
 // INITIALIZE
 
-var world = {
+var gameSettings = {
   worldImage: null,
   worldWidth: 1600,
   worldHeight: 1200,
-  maxPlayers: 32
+  maxPlayers: 32,
+  clientWindowWidth: 800,
+  clientWindowHeight: 600
 };
 
 //////////////////////////////////////////////////
 var players = [];
+var bullets = [];
 
-
+function Bullet(bulletData) {
+	this.x = bulletData.x;
+  this.y = bulletData.y;
+  this.direction = bulletData.direction;
+}
 
 function Player(id, positionObj, colorObj) {
 	this.id = id;
@@ -25,10 +32,9 @@ function Player(id, positionObj, colorObj) {
 
 function generateRandomPosition(){
   var positionObj = {
-    x: Math.floor((Math.random() * world.worldWidth) + 1),
-    y: Math.floor((Math.random() * world.worldHeight) + 1)
+    x: Math.floor((Math.random() * gameSettings.worldWidth) + 1),
+    y: Math.floor((Math.random() * gameSettings.worldHeight) + 1)
   };
-  console.log(positionObj);
   return positionObj;
 }
 
@@ -38,7 +44,6 @@ function generateRandomColor(){
     b: Math.floor((Math.random() * 235) + 20),
     g: Math.floor((Math.random() * 235) + 20)
   };
-  console.log(colorObj);
   return colorObj;
 }
 
@@ -58,59 +63,75 @@ var io = socket(server);
 setInterval(heartbeat, 16);
 setInterval(printServerState, 5000);
 function heartbeat(){
-  io.sockets.emit('heartbeat', players);
+  var heartbeatData = {
+    players: players,
+    bullets: bullets
+  };
+  io.sockets.emit('heartbeat', heartbeatData);
 }
 
 function printServerState(){
-  console.log('-- PLAYERS --');
+  console.log('PLAYERS ' + players.length);
   for (var i = 0; i < players.length; i++){
     var p = players[i];
-    console.log(p.id + '  |  x: ' + p.x + ' y: ' + p.y + '  |  RBG: ' + p.color.r + ' ' + p.color.b + ' ' + p.color.g);
+    console.log((i + 1) + ' > ' + p.id + '  |  x: ' + p.x + ' y: ' + p.y + '  |  RBG: ' + p.color.r + ' ' + p.color.b + ' ' + p.color.g);
   }
-  console.log('\n');
+
+  console.log('BULLETS ' + bullets.length);
+  for (var i = 0; i < bullets.length; i++){
+    var b = bullets[i];
+    console.log((i + 1) + ' > ' + b.id + '  |  x: ' + b.x + ' y: ' + b.y + '  |  ');
+  }
+  console.log('----------');
 }
 
 io.sockets.on('connection', function(socket) {
-	console.log('We have a new client: ' + socket.id);
+	console.log("CLIENT HAS CONNECTED  |  " + socket.id);
 
 	socket.on('start', function(data) {
-		//console.log(socket.id + " " + data.x + " " + data.y + " " + data.r + " " +data.heading);
-    var p = new Player(socket.id, generateRandomPosition(), generateRandomColor());
-		players.push(p);
-    //console.log(players);
+		var newPlayer = new Player(socket.id, generateRandomPosition(), generateRandomColor());
+		players.push(newPlayer);
 		//socket.broadcast.emit('mouse', data);
-    io.sockets.emit('initialize', world);
+    socket.emit('initialize', gameSettings, newPlayer);
 	});
 
-    socket.on('update', function(data) {
-        //console.log(data); 
-        //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
-        var p;
-        for (var i = 0; i < players.length; i++) {
-          if (socket.id == players[i].id) {
-            p = players[i];
-          }
-        }
+  socket.on('addBullet', function(data){
+    var newBullet = new Bullet(data);
+    bullets.push(newBullet);
+  });
 
-        if (p){
-          p.x = data.x;
-          p.y = data.y;
-          p.direction = data.direction;
-        }
+  socket.on('updateBulletPosition', function(data){
+    for (var i = 0; i < bullets.length; i++) {
+      if (socket.id == bullets[i].id) {
+        var bulletToUpdate = bullets[i];
+        b.x = data.x;
+        b.y = data.y;
+        b.direction = data.direction;
+        break;
+      }
+    }
+  });
 
-
+  socket.on('updatePlayerPosition', function(data) {
+    for (var i = 0; i < players.length; i++) {
+      if (socket.id == players[i].id) {
+        var playerToUpdate = players[i];
+        playerToUpdate.x = data.x;
+        playerToUpdate.y = data.y;
+        playerToUpdate.direction = data.direction;
+        break;
+      }
+    }
   });
 
   socket.on('disconnect', function() {
-    console.log("Client has disconnected");
-
+    console.log("CLIENT HAS DISCONNECTED  |  " + socket.id);
     for (var i = 0; i < players.length; i++) {
       if (socket.id == players[i].id) {
         players.splice(i, 1);
         break;
       }
-    } 
-
+    }
   });
 
 });

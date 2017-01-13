@@ -1,58 +1,39 @@
-// Daniel Shiffman
-// http://codingrainbow.com
-// http://patreon.com/codingrainbow
-// Code for: https://youtu.be/hacZU523FyM
 
-function Player(xPos, yPos, color) {
-  this.mapPosition = createVector(xPos, yPos);
-  this.screenPosition = createVector(width / 2, height / 2);
-  this.size = 20;
-  this.direction = 0;
-  this.color = color;
-
-  this.render = function() {
-    push();
-    
-	  //ellipse(this.x, this.y, 50, 50);
-    //var x = width / 2;
-    //var y = (height / 2) - 15;
-    translate(this.screenPosition.x, this.screenPosition.y);
-    rotate(this.direction);
-    noFill();
-    stroke(this.color.r, this.color.g, this.color.b);
-    strokeWeight(2);
-    var txt = 'MAP POSITION \n X: ' + this.mapPosition.x + ' Y: ' + this.mapPosition.y;
-    text(txt, 50, 50);
-    triangle(0, -this.size, this.size, this.size, -this.size, this.size);
-    
-    pop();
+function Player(playerSettings, gameSettings) {
+  this.id = playerSettings.id;
+  this.mapPosition = createVector(playerSettings.x, playerSettings.y);
+  this.screenPosition = createVector(gameSettings.clientWindowWidth / 2, gameSettings.clientWindowHeight / 2);
+  this.direction = playerSettings.direction;
+  this.isOpponent = false;
+  this.score = 0;
+  this.attributes = {
+    color: playerSettings.color,
+    speed: 5,
+    size: 20, // Examples for later
+    attack: 10, // Examples for later
+    defense: 10 // Examples for later
   };
 
-  this.renderOpponent = function(distanceObj){
+
+  this.render = function(distanceObj) {
     push();
-    
-	  //ellipse(this.x, this.y, 50, 50);
-    //var x = width / 2;
-    //var y = (height / 2) - 15;
-    if (distanceObj){
-translate(this.screenPosition.x + distanceObj.x, this.screenPosition.y + distanceObj.y);
+
+    // Translate the opponents according to distance from main player
+    if (this.isOpponent && distanceObj){
+      translate(this.screenPosition.x + distanceObj.x, this.screenPosition.y + distanceObj.y);
     }else{
-translate(this.mapPosition.x, this.mapPosition.y);
+      translate(this.screenPosition.x, this.screenPosition.y);
     }
-    
+
     rotate(this.direction);
     noFill();
-    stroke(this.color.r, this.color.g, this.color.b);
-    strokeWeight(2);
+    stroke(this.attributes.color.r, this.attributes.color.g, this.attributes.color.b);
+    strokeWeight(1);
     var txt = 'MAP POSITION \n X: ' + this.mapPosition.x + ' Y: ' + this.mapPosition.y;
-    text(txt, 50, 50);
-    triangle(0, -this.size, this.size, this.size, -this.size, this.size);
+    text(txt, 20, 0);
+    triangle(0, -this.attributes.size, this.attributes.size, this.attributes.size, -this.attributes.size, this.attributes.size);
     
     pop();
-  }
-
-  this.setDirection = function(direction){
-    this.direction = direction;
   };
 
   this.point = function(mousePosition){
@@ -64,42 +45,34 @@ translate(this.mapPosition.x, this.mapPosition.y);
   };
 
   this.move = function() {
-    
     // LEFT
     if (keyIsDown(65)){
-      this.mapPosition.x -= 5;
+      this.mapPosition.x -= 1 * this.attributes.speed;
     }
-
     // RIGHT
     if (keyIsDown(68)){
-      this.mapPosition.x += 5;
+      this.mapPosition.x += 1 * this.attributes.speed;
     }
-
     // UP
     if (keyIsDown(87)){
-      this.mapPosition.y -= 5;
+      this.mapPosition.y -= 1 * this.attributes.speed;
     }
-
     // DOWN
     if (keyIsDown(83)){
-      this.mapPosition.y += 5;
+      this.mapPosition.y += 1 * this.attributes.speed;
     }
 
-    this.mapPosition.x = constrain(this.mapPosition.x, 0, worldWidth);
-    this.mapPosition.y = constrain(this.mapPosition.y, 0, worldHeight);
+    this.mapPosition.x = constrain(this.mapPosition.x, 0, gameSettings.worldWidth);
+    this.mapPosition.y = constrain(this.mapPosition.y, 0, gameSettings.worldHeight);
     
   };
 
-  this.calculateDistance = function(otherPlayer){
+  this.calculateDistanceToObject = function(object){
     var distanceObj = {
-      x: this.mapPosition.x - otherPlayer.mapPosition.x,
-      y: this.mapPosition.y - otherPlayer.mapPosition.y,
-      distance: dist(this.mapPosition.x, this.mapPosition.y, otherPlayer.mapPosition.x, otherPlayer.mapPosition.y)
+      x: this.mapPosition.x - object.mapPosition.x,
+      y: this.mapPosition.y - object.mapPosition.y,
+      distance: dist(this.mapPosition.x, this.mapPosition.y, object.mapPosition.x, object.mapPosition.y)
     }
     return distanceObj;
   }
-  /* FOR TEST PURPOSES */
-  this.grow = function(){
-    this.size += 10;
-  };
 }
