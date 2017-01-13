@@ -6,21 +6,25 @@
 
 var socket;
 var player;
-
+var world;
 var players = [];
 var player = null;
+
+var worldWidth;
+var worldHeight;
+
 function setup() {
-  createCanvas(500, 500);
+  
 
   socket = io.connect('http://192.168.2.127:3000');
+  socket.emit('start', null);
 
-  var data = {
-	  x: 50,
-	  y: 50,
-  };
-  
-  socket.emit('start', data);
-  
+  socket.on('initialize', function(data){
+    worldWidth = data.worldWidth;
+    worldHeight = data.worldHeight;
+    world = new World(worldWidth, worldHeight);
+    createCanvas(800, 600);
+  });
   
   socket.on('heartbeat',
     function(data) {
@@ -34,10 +38,34 @@ function setup() {
 function draw() {
   background(0);
   //alert(players);
+
+  if (world){
+    world.render();
+    /*
+    if (player){
+      world.renderAccordingToPlayer(player);
+    }else{
+      world.render();
+    }
+    */
+  }
   for (var i = 0; i < players.length; i++) {
     console.log(players[i]);
     var id = players[i].id;
     if (id !== socket.id) {
+      var p = new Player(players[i].x, players[i].y, players[i].color);
+      p.setDirection(players[i].direction);
+      
+
+      if (player){
+        var distanceObj = p.calculateDistance(player);
+        p.renderOpponent(distanceObj);
+      }else{
+        p.renderOpponent();
+      }
+      /*
+      push();
+      translate()
       fill(players[i].color.r, players[i].color.g, players[i].color.b);
       
       ellipse(players[i].x, players[i].y, 50, 50);
@@ -46,23 +74,31 @@ function draw() {
       textAlign(CENTER);
       textSize(20);
       text(players[i].id, players[i].x, players[i].y);
-    }else{
 
+      pop();
+      */
+    }else{
+      
       if (!player){
         player = new Player(players[i].x, players[i].y, players[i].color);
-        player.render();
+        player.point(createVector(mouseX, mouseY));
+        player.render(width, height);
+        
         player.move();
         var data = {
-          x: player.x,
-          y: player.y,
+          x: player.mapPosition.x,
+          y: player.mapPosition.y,
+          direction: player.direction
         };
         socket.emit('update', data);
       }else{
-        player.render();
+        player.point(createVector(mouseX, mouseY));
+        player.render(width, height);
         player.move();
         var data = {
-          x: player.x,
-          y: player.y,
+          x: player.mapPosition.x,
+          y: player.mapPosition.y,
+          direction: player.direction
         };
         socket.emit('update', data);
       }
@@ -70,5 +106,6 @@ function draw() {
   }
 }
 
- function mouseClicked() {
-  }  
+function mouseClicked() {
+  player.grow();
+}  
